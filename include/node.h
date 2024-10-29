@@ -20,7 +20,10 @@ public:
   void sendMessage(const std::string& message, Node* other);
   void receiveMessage(const std::string& message);
 
-  void onClick(const sf::Vector2f& clickPosition, std::function<void(Node*)>* action);
+  void onClick(const sf::Vector2f& clickPosition, std::function<void(Node*)> action);
+
+  void drawConnections(sf::RenderWindow& window);
+  void drawDirectedConnections(sf::RenderWindow& window);
 };
 
 #endif
