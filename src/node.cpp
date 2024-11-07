@@ -7,6 +7,14 @@ Node::Node(float x, float y) {
   circle.setFillColor(sf::Color::Red);
 }
 
+bool Node::operator<(const Node& other) const {
+  return id < other.id;
+}
+
+void Node::setOnClickAction(std::function<void(Node*)> action) {
+  onClickAction = action;
+}
+
 void Node::addConnection(Node* other) {
   connections.push_back(other);
 }
@@ -20,12 +28,14 @@ void Node::receiveMessage(const std::string& message) {
   messages.push_back(message);
 }
 
-void Node::onClick(const sf::Vector2f& clickPosition, std::function<void(Node*)> action) {
+bool Node::onClick(const sf::Vector2f& clickPosition) {
     float distance = std::sqrt(std::pow(circle.getPosition().x - clickPosition.x, 2) +
                               std::pow(circle.getPosition().y - clickPosition.y, 2));
     if (distance < circle.getRadius()) {
-      action(this);
+      onClickAction(this);
+      return true;
     }
+    return false;
 }
 
 void Node::drawConnections(sf::RenderWindow& window) {
@@ -100,5 +110,24 @@ void Node::drawDirectedConnections(sf::RenderWindow& window) {
             sf::Vertex(arrowPoint2)
         };
         window.draw(arrowhead, 4, sf::Lines);
+    }
+}
+
+void Node::drawMessages(sf::RenderWindow& window) {
+    for (size_t i = 0; i < messages.size(); ++i) {
+        static sf::Font font;
+        static bool isFontLoaded = false;
+        if (!isFontLoaded) {
+            if (!font.loadFromFile("path/to/font.ttf")) {
+          // Handle error, use default font
+          if (!font.loadFromFile("/System/Library/Fonts/SFNS.ttf")) {
+              // Handle error if default font is not found
+          }
+            }
+            isFontLoaded = true;
+        }
+        sf::Text text(messages[i], font, 12);
+        text.setPosition(circle.getPosition().x + circle.getRadius() + 5, circle.getPosition().y + i * 15);
+        window.draw(text);
     }
 }
